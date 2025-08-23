@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Super Visual</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="quiz-container">
+    <h2>Quiz Super Visual</h2>
+    <div id="areaSelection" class="area-selection">
+        <p>Escolha uma área de conhecimento:</p>
+        <button class="mat" onclick="startQuiz('Matemática')">Matemática</button>
+        <button class="hist" onclick="startQuiz('História')">História</button>
+        <button class="cien" onclick="startQuiz('Ciências')">Ciências</button>
+    </div>
+    <div id="quiz" style="display:none;"></div>
+    <div class="progress-bar-container" style="display:none;">
+        <div id="progressBar" class="progress-bar"></div>
+    </div>
+    <div class="stars" id="stars"></div>
+    <div class="result" id="result"></div>
+    <button id="nextBtn" style="display:none;">Próxima</button>
+    <button id="restartBtn" style="display:none;" onclick="restartQuiz()">Reiniciar Área</button>
+    <button id="finalBtn" style="display:none;" onclick="showFinalResults()">Ver Resultado Final</button>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
