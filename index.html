@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Quiz Iniciante</title>
   <style>
     body {
@@ -23,6 +23,7 @@
     }
     .question {
       margin-bottom: 15px;
+      font-weight: bold;
     }
     .options button {
       display: block;
@@ -37,15 +38,26 @@
     .options button:hover {
       background: #d0d0d0;
     }
-    #nextBtn {
+    #nextBtn, #restartBtn {
       margin-top: 20px;
       padding: 10px;
       width: 100%;
-      background: #4CAF50;
-      color: white;
       border: none;
       border-radius: 5px;
+      color: white;
       cursor: pointer;
+    }
+    #nextBtn {
+      background: #4CAF50;
+    }
+    #restartBtn {
+      background: #f44336;
+    }
+    #nextBtn:hover {
+      background: #45a049;
+    }
+    #restartBtn:hover {
+      background: #d32f2f;
     }
     #result {
       margin-top: 20px;
@@ -61,6 +73,7 @@
       <div class="question" id="question"></div>
       <div class="options" id="options"></div>
       <button id="nextBtn" onclick="nextQuestion()">Próxima</button>
+      <button id="restartBtn" onclick="restartQuiz()">Reiniciar Quiz</button>
       <div id="result"></div>
     </div>
   </div>
@@ -158,6 +171,7 @@
         btn.onclick = () => checkAnswer(index);
         optionsDiv.appendChild(btn);
       });
+      document.getElementById("result").innerText = "";
     }
 
     function checkAnswer(index) {
@@ -176,8 +190,25 @@
       if (currentQuestion < quizData.length) {
         loadQuestion();
       } else {
-        document.getElementById("quiz").innerHTML = `<h3>Você acertou ${score} de ${quizData.length} perguntas!</h3>`;
+        document.getElementById("quiz").innerHTML = `
+          <h3>Você acertou ${score} de ${quizData.length} perguntas!</h3>
+          <button id="restartBtn" onclick="restartQuiz()">Reiniciar Quiz</button>
+        `;
       }
+    }
+
+    function restartQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      document.getElementById("quiz").innerHTML = `
+        <div class="question" id="question"></div>
+        <div class="options" id="options"></div>
+        <button id="nextBtn" onclick="nextQuestion()">Próxima</button>
+        <button id="restartBtn" onclick="restartQuiz()">Reiniciar Quiz</button>
+        <div id="result"></div>
+      `;
+      document.getElementById("nextBtn").style.display = "none";
+      loadQuestion();
     }
 
     loadQuestion();
