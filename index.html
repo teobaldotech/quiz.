@@ -1,30 +1,186 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Super Visual</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Iniciante</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      padding: 20px;
+    }
+    .quiz-container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+    }
+    .question {
+      margin-bottom: 15px;
+    }
+    .options button {
+      display: block;
+      margin: 5px 0;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 5px;
+      background: #e0e0e0;
+      cursor: pointer;
+    }
+    .options button:hover {
+      background: #d0d0d0;
+    }
+    #nextBtn {
+      margin-top: 20px;
+      padding: 10px;
+      width: 100%;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-<div class="quiz-container">
-    <h2>Quiz Super Visual</h2>
-    <div id="areaSelection" class="area-selection">
-        <p>Escolha uma área de conhecimento:</p>
-        <button class="mat" onclick="startQuiz('Matemática')">Matemática</button>
-        <button class="hist" onclick="startQuiz('História')">História</button>
-        <button class="cien" onclick="startQuiz('Ciências')">Ciências</button>
+  <div class="quiz-container">
+    <h2>Quiz Iniciante: Geografia, Português e Artes</h2>
+    <div id="quiz">
+      <div class="question" id="question"></div>
+      <div class="options" id="options"></div>
+      <button id="nextBtn" onclick="nextQuestion()">Próxima</button>
+      <div id="result"></div>
     </div>
-    <div id="quiz" style="display:none;"></div>
-    <div class="progress-bar-container" style="display:none;">
-        <div id="progressBar" class="progress-bar"></div>
-    </div>
-    <div class="stars" id="stars"></div>
-    <div class="result" id="result"></div>
-    <button id="nextBtn" style="display:none;">Próxima</button>
-    <button id="restartBtn" style="display:none;" onclick="restartQuiz()">Reiniciar Área</button>
-    <button id="finalBtn" style="display:none;" onclick="showFinalResults()">Ver Resultado Final</button>
-</div>
-<script src="script.js"></script>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        pergunta: "Qual é o nome do continente onde está localizado o Brasil?",
+        alternativas: ["África", "América do Sul", "Europa", "Ásia"],
+        correta: 1
+      },
+      {
+        pergunta: "Qual é a capital do estado brasileiro do Rio Grande do Sul?",
+        alternativas: ["Curitiba", "Porto Alegre", "Belo Horizonte", "Florianópolis"],
+        correta: 1
+      },
+      {
+        pergunta: "Qual é o nome do astro que ilumina a Terra durante o dia?",
+        alternativas: ["Lua", "Sol", "Estrela-do-mar", "Vênus"],
+        correta: 1
+      },
+      {
+        pergunta: "Qual palavra abaixo é um substantivo?",
+        alternativas: ["Rapidamente", "Bonito", "Correr", "Mesa"],
+        correta: 3
+      },
+      {
+        pergunta: "Qual palavra abaixo é um advérbio?",
+        alternativas: ["Andar", "Devagar", "Casa", "Feliz"],
+        correta: 1
+      },
+      {
+        pergunta: "Qual é o plural da palavra 'animal'?",
+        alternativas: ["Animãos", "Animais", "Animalhos", "Animaises"],
+        correta: 1
+      },
+      {
+        pergunta: "Qual artista brasileiro é conhecido por pintar 'O Vendedor de Frutas'?",
+        alternativas: ["Tarsila do Amaral", "Di Cavalcanti", "Romero Britto", "Cândido Portinari"],
+        correta: 1
+      },
+      {
+        pergunta: "Qual movimento artístico é conhecido por usar formas geométricas?",
+        alternativas: ["Surrealismo", "Cubismo", "Barroco", "Romantismo"],
+        correta: 1
+      },
+      {
+        pergunta: "Qual artista pintou 'O Jardim das Delícias Terrenas'?",
+        alternativas: ["Leonardo da Vinci", "Claude Monet", "Michelangelo", "Hieronymus Bosch"],
+        correta: 3
+      },
+      {
+        pergunta: "Qual continente é conhecido por ter o deserto do Saara?",
+        alternativas: ["América", "África", "Europa", "Ásia"],
+        correta: 1
+      },
+      {
+        pergunta: "Qual é a função do ponto final em uma frase?",
+        alternativas: ["Mostrar surpresa", "Separar palavras", "Indicar pergunta", "Encerrar uma ideia"],
+        correta: 3
+      },
+      {
+        pergunta: "Qual é o nome da técnica artística que usa pequenos pedaços coloridos para formar imagens?",
+        alternativas: ["Aquarela", "Óleo sobre tela", "Grafite", "Mosaico"],
+        correta: 3
+      },
+      {
+        pergunta: "Qual é a capital da Itália?",
+        alternativas: ["Madri", "Paris", "Berlim", "Roma"],
+        correta: 3
+      },
+      {
+        pergunta: "Qual é o nome do ponto turístico famoso de São Paulo com vista da cidade?",
+        alternativas: ["Pelourinho", "Cristo Redentor", "Farol da Barra", "Pico do Jaraguá"],
+        correta: 3
+      },
+      {
+        pergunta: "Qual é a estação do ano mais quente?",
+        alternativas: ["Primavera", "Verão", "Outono", "Inverno"],
+        correta: 1
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    function loadQuestion() {
+      const q = quizData[currentQuestion];
+      document.getElementById("question").innerText = q.pergunta;
+      const optionsDiv = document.getElementById("options");
+      optionsDiv.innerHTML = "";
+      q.alternativas.forEach((alt, index) => {
+        const btn = document.createElement("button");
+        btn.innerText = alt;
+        btn.onclick = () => checkAnswer(index);
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(index) {
+      const correct = quizData[currentQuestion].correta;
+      if (index === correct) score++;
+      document.getElementById("nextBtn").style.display = "block";
+      Array.from(document.getElementById("options").children).forEach((btn, i) => {
+        btn.disabled = true;
+        btn.style.background = i === correct ? "#a8e6cf" : "#ff8b94";
+      });
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      document.getElementById("nextBtn").style.display = "none";
+      if (currentQuestion < quizData.length) {
+        loadQuestion();
+      } else {
+        document.getElementById("quiz").innerHTML = `<h3>Você acertou ${score} de ${quizData.length} perguntas!</h3>`;
+      }
+    }
+
+    loadQuestion();
+  </script>
 </body>
 </html>
