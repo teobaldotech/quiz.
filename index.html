@@ -1,268 +1,182 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Quiz por Matérias</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
-      padding: 20px;
-    }
-    .container {
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 600px;
-      margin: auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    h2, h3 {
-      text-align: center;
-    }
-    .question {
-      margin-bottom: 15px;
-      font-weight: bold;
-    }
-    .options button {
-      display: block;
-      margin: 5px 0;
-      padding: 10px;
-      width: 100%;
-      border: none;
-      border-radius: 5px;
-      background: #e0e0e0;
-      cursor: pointer;
-    }
-    .options button:hover {
-      background: #d0d0d0;
-    }
-    #nextBtn, #restartBtn {
-      margin-top: 20px;
-      padding: 10px;
-      width: 100%;
-      border: none;
-      border-radius: 5px;
-      color: white;
-      cursor: pointer;
-    }
-    #nextBtn {
-      background: #4CAF50;
-      display: none;
-    }
-    #restartBtn {
-      background: #f44336;
-    }
-    #nextBtn:hover { background: #45a049; }
-    #restartBtn:hover { background: #d32f2f; }
-    #result {
-      margin-top: 20px;
-      font-weight: bold;
-      text-align: center;
-    }
-    /* Barra de progresso */
-    #progress-container {
-      width: 100%;
-      background: #ddd;
-      border-radius: 8px;
-      overflow: hidden;
-      margin: 10px 0;
-    }
-    #progress-bar {
-      height: 15px;
-      width: 0%;
-      background: #4CAF50;
-      transition: width 0.3s ease;
-    }
-    #progress-text {
-      text-align: center;
-      margin-bottom: 10px;
-      font-size: 14px;
-      color: #333;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Quiz por Matérias PRO</title>
+
+<style>
+body{
+  font-family: Arial, Helvetica, sans-serif;
+  background:#eef2f7;
+  padding:20px;
+}
+.container{
+  background:white;
+  padding:20px;
+  border-radius:10px;
+  max-width:700px;
+  margin:auto;
+  box-shadow:0 0 15px rgba(0,0,0,0.15);
+}
+button{
+  padding:10px;
+  margin:5px 0;
+  width:100%;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+  font-size:15px;
+}
+.options button:hover{opacity:0.9}
+#nextBtn{background:#4CAF50;color:white;display:none}
+#menuBtn{background:#2196F3;color:white}
+#restartBtn{background:#f44336;color:white}
+#timer{font-weight:bold;color:#d32f2f;text-align:center}
+#progress{height:12px;background:#ddd;border-radius:8px;margin:10px 0;overflow:hidden}
+#bar{height:12px;background:#4CAF50;width:0%}
+</style>
 </head>
 <body>
-  <div class="container">
-    <h2>Quiz por Matérias</h2>
-    
-    <div id="menu">
-      <h3>Escolha uma matéria:</h3>
-      <button onclick="startQuiz('geografia')">🌎 Geografia</button>
-      <button onclick="startQuiz('portugues')">📝 Português</button>
-      <button onclick="startQuiz('artes')">🎨 Artes</button>
-      <button onclick="startQuiz('matematica')">🔢 Matemática</button>
-      <button onclick="startQuiz('ciencias')">🔬 Ciências</button>
-      <button onclick="startQuiz('historia')">📜 História</button>
-    </div>
 
-    <div id="quiz" style="display:none;">
-      <div id="progress-text"></div>
-      <div id="progress-container">
-        <div id="progress-bar"></div>
-      </div>
-      <div class="question" id="question"></div>
-      <div class="options" id="options"></div>
-      <button id="nextBtn" onclick="nextQuestion()">Próxima</button>
-      <button id="restartBtn" onclick="restartQuiz()">Reiniciar Quiz</button>
-      <div id="result"></div>
-    </div>
-  </div>
+<div class="container">
+<h2>🎓 Quiz por Matérias PRO</h2>
 
-  <script>
-    const quizData = {
-      geografia: [
-        { pergunta: "Qual é o maior país do mundo em área territorial?", alternativas: ["China","EUA","Rússia","Canadá"], correta: 2 },
-        { pergunta: "Qual é a capital da Argentina?", alternativas: ["Lima","Buenos Aires","Santiago","Montevidéu"], correta: 1 },
-        { pergunta: "Qual continente é conhecido como 'berço da humanidade'?", alternativas: ["África","Europa","Ásia","Oceania"], correta: 0 },
-        { pergunta: "Qual é o rio mais extenso do mundo?", alternativas: ["Nilo","Amazonas","Yangtzé","Mississipi"], correta: 1 },
-        { pergunta: "Qual é a capital da França?", alternativas: ["Roma","Berlim","Paris","Londres"], correta: 2 },
-        { pergunta: "Qual deserto é o maior do mundo?", alternativas: ["Saara","Kalahari","Atacama","Gobi"], correta: 0 },
-        { pergunta: "Em qual continente está o Egito?", alternativas: ["África","Ásia","Europa","América"], correta: 0 },
-        { pergunta: "Qual é o país mais populoso do mundo?", alternativas: ["Índia","China","EUA","Indonésia"], correta: 1 },
-        { pergunta: "Qual é o oceano entre África e Austrália?", alternativas: ["Atlântico","Pacífico","Índico","Ártico"], correta: 2 },
-        { pergunta: "Qual país tem formato parecido com uma bota?", alternativas: ["Espanha","Itália","Portugal","Grécia"], correta: 1 }
-      ],
-      portugues: [
-        { pergunta: "Qual é o plural de 'pão'?", alternativas: ["Pães","Pãos","Paões","Paães"], correta: 0 },
-        { pergunta: "Qual palavra é um adjetivo?", alternativas: ["Casa","Bonito","Rapidamente","Correr"], correta: 1 },
-        { pergunta: "Qual é o sinônimo de 'feliz'?", alternativas: ["Triste","Contente","Bravo","Cansado"], correta: 1 },
-        { pergunta: "Qual é o antônimo de 'alto'?", alternativas: ["Pequeno","Grande","Baixo","Magro"], correta: 2 },
-        { pergunta: "Qual palavra é um substantivo comum?", alternativas: ["Brasil","João","Cidade","Deus"], correta: 2 },
-        { pergunta: "Qual é a função do ponto de interrogação?", alternativas: ["Finalizar frase","Expressar dúvida","Mostrar surpresa","Separar palavras"], correta: 1 },
-        { pergunta: "Qual palavra está no diminutivo?", alternativas: ["Casinha","Casa","Casarão","Casão"], correta: 0 },
-        { pergunta: "Qual é o verbo na frase 'Ela canta bem'?", alternativas: ["Ela","Canta","Bem","Nenhum"], correta: 1 },
-        { pergunta: "Qual palavra é um advérbio?", alternativas: ["Rápido","Rapidamente","Rapidez","Rápida"], correta: 1 },
-        { pergunta: "Qual é a forma correta: 'houveram problemas' ou 'houve problemas'?", alternativas: ["Houveram problemas","Houve problemas","As duas estão corretas","Nenhuma"], correta: 1 }
-      ],
-      artes: [
-        { pergunta: "Quem pintou a Mona Lisa?", alternativas: ["Michelangelo","Da Vinci","Van Gogh","Picasso"], correta: 1 },
-        { pergunta: "Qual movimento artístico usava formas geométricas?", alternativas: ["Cubismo","Barroco","Surrealismo","Romantismo"], correta: 0 },
-        { pergunta: "Qual artista é famoso por cortar sua própria orelha?", alternativas: ["Van Gogh","Rembrandt","Monet","Dalí"], correta: 0 },
-        { pergunta: "Quem pintou o teto da Capela Sistina?", alternativas: ["Rafael","Michelangelo","Donatello","Da Vinci"], correta: 1 },
-        { pergunta: "O Abaporu foi pintado por quem?", alternativas: ["Portinari","Tarsila do Amaral","Di Cavalcanti","Volpi"], correta: 1 },
-        { pergunta: "Qual arte usa pequenos pedaços coloridos formando imagens?", alternativas: ["Mosaico","Grafite","Aquarela","Escultura"], correta: 0 },
-        { pergunta: "Qual movimento foi Salvador Dalí?", alternativas: ["Cubismo","Surrealismo","Impressionismo","Futurismo"], correta: 1 },
-        { pergunta: "O Guernica foi pintado por?", alternativas: ["Picasso","Miró","Dalí","Velázquez"], correta: 0 },
-        { pergunta: "Qual artista pintou 'O Grito'?", alternativas: ["Munch","Klimt","Cézanne","Monet"], correta: 0 },
-        { pergunta: "Cândido Portinari é famoso por qual obra?", alternativas: ["Os Retirantes","A Persistência da Memória","Noite Estrelada","Guernica"], correta: 0 }
-      ],
-      matematica: [
-        { pergunta: "Quanto é 7 x 8?", alternativas: ["54","56","58","64"], correta: 1 },
-        { pergunta: "Qual é a raiz quadrada de 81?", alternativas: ["7","8","9","10"], correta: 2 },
-        { pergunta: "Quanto é 100 dividido por 4?", alternativas: ["20","25","30","40"], correta: 1 },
-        { pergunta: "Qual é o número primo?", alternativas: ["15","21","23","27"], correta: 2 },
-        { pergunta: "Quanto é 12 + 15?", alternativas: ["25","26","27","28"], correta: 2 },
-        { pergunta: "Qual é o valor de π (aproximado)?", alternativas: ["2,14","3,14","4,13","3,41"], correta: 1 },
-        { pergunta: "Qual é o dobro de 45?", alternativas: ["80","85","90","95"], correta: 2 },
-        { pergunta: "Quanto é 50% de 200?", alternativas: ["50","100","150","200"], correta: 1 },
-        { pergunta: "Quanto é 9²?", alternativas: ["81","72","99","90"], correta: 0 },
-        { pergunta: "Qual é a metade de 1.000?", alternativas: ["100","250","500","750"], correta: 2 }
-      ],
-      ciencias: [
-        { pergunta: "Qual órgão bombeia sangue no corpo?", alternativas: ["Pulmão","Coração","Estômago","Fígado"], correta: 1 },
-        { pergunta: "Qual planeta é conhecido como planeta vermelho?", alternativas: ["Terra","Marte","Vênus","Júpiter"], correta: 1 },
-        { pergunta: "Qual gás os seres humanos respiram?", alternativas: ["Hidrogênio","Oxigênio","Carbono","Nitrogênio"], correta: 1 },
-        { pergunta: "Qual astro é o centro do sistema solar?", alternativas: ["Lua","Terra","Sol","Saturno"], correta: 2 },
-        { pergunta: "Qual é o estado da água a 100ºC?", alternativas: ["Sólido","Gasoso","Líquido","Plasma"], correta: 1 },
-        { pergunta: "Qual animal é um mamífero?", alternativas: ["Jacaré","Golfinho","Sapo","Galinha"], correta: 1 },
-        { pergunta: "Qual parte da planta faz fotossíntese?", alternativas: ["Raiz","Folha","Flor","Caule"], correta: 1 },
-        { pergunta: "Qual planeta é o maior do sistema solar?", alternativas: ["Saturno","Júpiter","Netuno","Urano"], correta: 1 },
-        { pergunta: "O que o DNA carrega?", alternativas: ["Energia","Informação genética","Água","Proteínas"], correta: 1 },
-        { pergunta: "Qual é a camada protetora da Terra?", alternativas: ["Atmosfera","Ozônio","Crosta","Nuvens"], correta: 1 }
-      ],
-      historia: [
-        { pergunta: "Quem foi o primeiro presidente do Brasil?", alternativas: ["Getúlio Vargas","Dom Pedro II","Deodoro da Fonseca","Floriano Peixoto"], correta: 2 },
-        { pergunta: "Quem descobriu o Brasil em 1500?", alternativas: ["Pedro Álvares Cabral","Cristóvão Colombo","Vasco da Gama","Cabralzinho"], correta: 0 },
-        { pergunta: "Qual foi a primeira capital do Brasil?", alternativas: ["Rio de Janeiro","Brasília","Salvador","São Paulo"], correta: 2 },
-        { pergunta: "Em que ano ocorreu a Independência do Brasil?", alternativas: ["1822","1889","1500","1808"], correta: 0 },
-        { pergunta: "Quem foi o imperador no 2º Reinado?", alternativas: ["Dom Pedro I","Dom Pedro II","Getúlio Vargas","Floriano Peixoto"], correta: 1 },
-        { pergunta: "Qual país iniciou a 2ª Guerra Mundial?", alternativas: ["Itália","Alemanha","Japão","EUA"], correta: 1 },
-        { pergunta: "Em que ano caiu o Muro de Berlim?", alternativas: ["1961","1989","1991","1945"], correta: 1 },
-        { pergunta: "Quem foi conhecido como 'pai da aviação'?", alternativas: ["Santos Dumont","Irmãos Wright","Leonardo da Vinci","Bartolomeu de Gusmão"], correta: 0 },
-        { pergunta: "Qual civilização construiu as pirâmides?", alternativas: ["Maias","Astecas","Egípcios","Romanos"], correta: 2 },
-        { pergunta: "Quem proclamou a República do Brasil?", alternativas: ["Getúlio Vargas","Marechal Deodoro","Dom Pedro II","Floriano Peixoto"], correta: 1 }
-      ]
-    };
+<div id="menu">
+<h3>Escolha a matéria:</h3>
+<button onclick="startQuiz('geografia')">🌎 Geografia</button>
+<button onclick="startQuiz('portugues')">📝 Português</button>
+<button onclick="startQuiz('matematica')">🔢 Matemática</button>
+<button onclick="startQuiz('historia')">📜 História</button>
+<button onclick="startQuiz('ciencias')">🔬 Ciências</button>
+<button onclick="startQuiz('ingles')">🇬🇧 Inglês</button>
+<button onclick="startQuiz('informatica')">💻 Informática</button>
+<button onclick="startQuiz('educacao')">⚽ Educação Física</button>
+</div>
 
-    let currentSubject = "";
-    let questions = [];
-    let currentQuestion = 0;
-    let score = 0;
+<div id="quiz" style="display:none">
+<div id="timer"></div>
+<div id="progress"><div id="bar"></div></div>
+<div id="question"></div>
+<div class="options" id="options"></div>
+<div id="result"></div>
+<button id="nextBtn" onclick="nextQuestion()">Próxima</button>
+<button id="menuBtn" onclick="goMenu()">Voltar ao menu</button>
+</div>
 
-    function startQuiz(subject) {
-      currentSubject = subject;
-      questions = [...quizData[subject]].sort(() => Math.random() - 0.5);
-      currentQuestion = 0;
-      score = 0;
+</div>
 
-      document.getElementById("menu").style.display = "none";
-      document.getElementById("quiz").style.display = "block";
+<script>
+const timeLimit = 15;
+let timerInterval;
+let timeLeft;
 
-      loadQuestion();
-    }
+const quizData = {
+ingles:[
+{pergunta:"O que significa 'Apple'?", alternativas:["Banana","Maçã","Uva","Pera"], correta:1},
+{pergunta:"Tradução de 'Book'?", alternativas:["Livro","Caderno","Mesa","Caneta"], correta:0},
+{pergunta:"'Dog' significa?", alternativas:["Gato","Cachorro","Pássaro","Peixe"], correta:1},
+{pergunta:"Plural de 'Child'?", alternativas:["Childs","Children","Childes","Childer"], correta:1},
+{pergunta:"'Blue' é qual cor?", alternativas:["Azul","Verde","Preto","Branco"], correta:0}
+],
+informatica:[
+{pergunta:"O que é CPU?", alternativas:["Memória","Processador","Tela","Teclado"], correta:1},
+{pergunta:"Qual é um sistema operacional?", alternativas:["Windows","Chrome","Word","Excel"], correta:0},
+{pergunta:"O que é HTML?", alternativas:["Linguagem de marcação","Antivírus","Hardware","Navegador"], correta:0},
+{pergunta:"Qual dispositivo move o cursor?", alternativas:["Mouse","Monitor","Gabinete","Impressora"], correta:0},
+{pergunta:"O que é um pendrive?", alternativas:["Memória USB","Teclado","Cabo","Placa"], correta:0}
+],
+educacao:[
+{pergunta:"Quantos jogadores tem um time de futebol?", alternativas:["9","10","11","12"], correta:2},
+{pergunta:"Qual esporte usa cesta?", alternativas:["Futebol","Basquete","Vôlei","Tênis"], correta:1},
+{pergunta:"Qual exercício trabalha pernas?", alternativas:["Agachamento","Flexão","Abdominal","Barra"], correta:0},
+{pergunta:"O que melhora o condicionamento?", alternativas:["Sedentarismo","Exercício","Sono excessivo","TV"], correta:1},
+{pergunta:"Qual esporte usa raquete?", alternativas:["Natação","Tênis","Futebol","Basquete"], correta:1}
+]
+};
 
-    function loadQuestion() {
-      const q = questions[currentQuestion];
-      document.getElementById("progress-text").innerText =
-        `Pergunta ${currentQuestion + 1} de ${questions.length}`;
-      
-      // Atualiza barra de progresso
-      const progressPercent = ((currentQuestion) / questions.length) * 100;
-      document.getElementById("progress-bar").style.width = progressPercent + "%";
+// junta com matérias antigas se existirem
+Object.assign(quizData, window.quizData||{});
 
-      document.getElementById("question").innerText = q.pergunta;
+let questions=[],current=0,score=0,subject="";
 
-      const optionsDiv = document.getElementById("options");
-      optionsDiv.innerHTML = "";
-      q.alternativas.forEach((alt, index) => {
-        const btn = document.createElement("button");
-        btn.innerText = alt;
-        btn.onclick = () => checkAnswer(index);
-        optionsDiv.appendChild(btn);
-      });
+function startQuiz(sub){
+subject=sub;
+questions=[...quizData[sub]].sort(()=>Math.random()-0.5);
+current=0;score=0;
+document.getElementById("menu").style.display="none";
+document.getElementById("quiz").style.display="block";
+loadQuestion();
+}
 
-      document.getElementById("result").innerText = "";
-    }
+function loadQuestion(){
+const q=questions[current];
+document.getElementById("question").innerText=q.pergunta;
+document.getElementById("options").innerHTML="";
+document.getElementById("result").innerText="";
+questions[current].alternativas.forEach((alt,i)=>{
+let b=document.createElement("button");
+b.innerText=alt;
+b.onclick=()=>checkAnswer(i);
+document.getElementById("options").appendChild(b);
+});
+updateProgress();
+startTimer();
+}
 
-    function checkAnswer(index) {
-      const correct = questions[currentQuestion].correta;
-      if (index === correct) {
-        score++;
-        document.getElementById("result").innerText = "✅ Resposta correta!";
-      } else {
-        document.getElementById("result").innerText = "❌ Resposta incorreta.";
-      }
-      document.getElementById("nextBtn").style.display = "block";
+function startTimer(){
+timeLeft=timeLimit;
+document.getElementById("timer").innerText="⏱️ Tempo: "+timeLeft+"s";
+timerInterval=setInterval(()=>{
+timeLeft--;
+document.getElementById("timer").innerText="⏱️ Tempo: "+timeLeft+"s";
+if(timeLeft<=0){clearInterval(timerInterval);checkAnswer(-1);}
+},1000);
+}
 
-      Array.from(document.getElementById("options").children).forEach((btn, i) => {
-        btn.disabled = true;
-        btn.style.background = i === correct ? "#a8e6cf" : "#ff8b94";
-      });
-    }
+function checkAnswer(i){
+clearInterval(timerInterval);
+let correct=questions[current].correta;
+let res=document.getElementById("result");
+if(i===correct){score++;res.innerText="✅ Correto!";}
+else res.innerText="❌ Errado! Correta: "+questions[current].alternativas[correct];
+[...document.getElementById("options").children].forEach((b,idx)=>{
+b.disabled=true;
+b.style.background= idx===correct?"#a8e6cf":"#ff8b94";
+});
+document.getElementById("nextBtn").style.display="block";
+}
 
-    function nextQuestion() {
-      currentQuestion++;
-      document.getElementById("nextBtn").style.display = "none";
+function nextQuestion(){
+current++;
+document.getElementById("nextBtn").style.display="none";
+if(current<questions.length)loadQuestion();
+else finishQuiz();
+}
 
-      if (currentQuestion < questions.length) {
-        loadQuestion();
-      } else {
-        document.getElementById("progress-bar").style.width = "100%";
-        document.getElementById("progress-text").innerText =
-          `Concluído!`;
-        document.getElementById("quiz").innerHTML = `
-          <h3>Você acertou ${score} de ${questions.length} perguntas em ${currentSubject}!</h3>
-          <button id="restartBtn" onclick="restartQuiz()">Reiniciar Quiz</button>
-        `;
-      }
-    }
+function finishQuiz(){
+let percent=Math.round((score/questions.length)*100);
+saveRanking(subject,percent);
+document.getElementById("quiz").innerHTML=`
+<h3>Você acertou ${score}/${questions.length} (${percent}%)</h3>
+<h4>🏆 Melhor pontuação em ${subject}: ${getRanking(subject)}%</h4>
+<button onclick="goMenu()">Voltar ao menu</button>`;
+}
 
-    function restartQuiz() {
-      document.getElementById("menu").style.display = "block";
-      document.getElementById("quiz").style.display = "none";
-    }
-  </script>
+function updateProgress(){
+document.getElementById("bar").style.width=((current/questions.length)*100)+"%";
+}
+
+function goMenu(){location.reload();}
+
+function saveRanking(sub,percent){
+let best=localStorage.getItem("rank_"+sub)||0;
+if(percent>best)localStorage.setItem("rank_"+sub,percent);
+}
+
+function getRanking(sub){
+return localStorage.getItem("rank_"+sub)||0;
+}
+</script>
 </body>
 </html>
