@@ -1,0 +1,435 @@
+import React, { useEffect, useState } from "react";
+
+export default function App() {
+  const TIME_LIMIT = 15;
+
+  const quizData = {
+    geografia: [
+      {
+        id: 1,
+        pergunta: "Capital do Brasil?",
+        alternativas: ["Rio", "Brasília", "Salvador", "SP"],
+        correta: 1,
+      },
+      {
+        id: 2,
+        pergunta: "Maior continente?",
+        alternativas: ["África", "Europa", "Ásia", "América"],
+        correta: 2,
+      },
+    ],
+
+    portugues: [
+      {
+        id: 101,
+        pergunta: "Plural de pão?",
+        alternativas: ["Pãos", "Pães", "Pãons", "Pãeses"],
+        correta: 1,
+      },
+    ],
+
+    matematica: [
+      {
+        id: 201,
+        pergunta: "5 + 3?",
+        alternativas: ["7", "8", "9", "10"],
+        correta: 1,
+      },
+    ],
+
+    historia: [
+      {
+        id: 301,
+        pergunta: "Descobridor do Brasil?",
+        alternativas: ["Cabral", "Colombo", "Vasco", "Magalhães"],
+        correta: 0,
+      },
+    ],
+
+    ciencias: [
+      {
+        id: 401,
+        pergunta: "Planeta vermelho?",
+        alternativas: ["Marte", "Terra", "Júpiter", "Vênus"],
+        correta: 0,
+      },
+    ],
+
+    ingles: [
+      {
+        id: 501,
+        pergunta: "House?",
+        alternativas: ["Casa", "Carro", "Mesa", "Porta"],
+        correta: 0,
+      },
+    ],
+
+    informatica: [
+      {
+        id: 601,
+        pergunta: "CPU é?",
+        alternativas: ["Memória", "Processador", "Tela", "Teclado"],
+        correta: 1,
+      },
+    ],
+
+    educacao: [
+      {
+        id: 701,
+        pergunta: "Jogadores no futebol?",
+        alternativas: ["9", "10", "11", "12"],
+        correta: 2,
+      },
+    ],
+  };
+
+  const [subject, setSubject] = useState("");
+  const [questions, setQuestions] = useState([]);
+  const [current, setCurrent] = useState(0);
+  const [score, setScore] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [finished, setFinished] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
+
+  function shuffle(array) {
+    const arr = [...array];
+
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+
+    return arr;
+  }
+
+  function getQuestions(subject) {
+    let all = [];
+
+    if (subject === "geral") {
+      all = Object.values(quizData).flat();
+    } else {
+      all = quizData[subject];
+    }
+
+    const key = `used_${subject}`;
+
+    let usedIds = JSON.parse(
+      localStorage.getItem(key) || "[]"
+    );
+
+    let unused = all.filter(
+      (q) => !usedIds.includes(q.id)
+    );
+
+    if (unused.length === 0) {
+      localStorage.removeItem(key);
+      unused = all;
+    }
+
+    return shuffle(unused);
+  }
+
+  function startQuiz(sub) {
+    setSubject(sub);
+    setQuestions(getQuestions(sub));
+    setCurrent(0);
+    setScore(0);
+    setSelected(null);
+    setFinished(false);
+    setTimeLeft(TIME_LIMIT);
+  }
+
+  const currentQuestion = questions[current];
+
+  useEffect(() => {
+    if (!subject) return;
+
+    if (selected !== null) return;
+
+    if (finished) return;
+
+    if (timeLeft <= 0) {
+      handleAnswer(-1);
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft, selected, finished]);
+
+  function handleAnswer(index) {
+    if (selected !== null) return;
+
+    setSelected(index);
+
+    const correct = currentQuestion.correta;
+
+    const key = `used_${subject}`;
+
+    let usedIds = JSON.parse(
+      localStorage.getItem(key) || "[]"
+    );
+
+    usedIds.push(currentQuestion.id);
+
+    localStorage.setItem(
+      key,
+      JSON.stringify(usedIds)
+    );
+
+    if (index === correct) {
+      setScore((prev) => prev + 1);
+    }
+  }
+
+  function nextQuestion() {
+    if (current + 1 < questions.length) {
+      setCurrent((prev) => prev + 1);
+      setSelected(null);
+      setTimeLeft(TIME_LIMIT);
+    } else {
+      setFinished(true);
+
+      const percent = Math.round(
+        (score / questions.length) * 100
+      );
+
+      const rankKey = `rank_${subject}`;
+
+      const best =
+        Number(localStorage.getItem(rankKey)) || 0;
+
+      if (percent > best) {
+        localStorage.setItem(rankKey, percent);
+      }
+    }
+  }
+
+  function restart() {
+    setSubject("");
+    setQuestions([]);
+    setCurrent(0);
+    setScore(0);
+    setSelected(null);
+    setFinished(false);
+  }
+
+  const progress =
+    questions.length > 0
+      ? ((current + 1) / questions.length) * 100
+      : 0;
+
+  return (
+    <div
+      style={{
+        background: "#eef2f7",
+        minHeight: "100vh",
+        padding: 20,
+        fontFamily: "Arial",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 700,
+          margin: "auto",
+          background: "white",
+          padding: 20,
+          borderRadius: 10,
+          boxShadow: "0 0 15px rgba(0,0,0,.15)",
+        }}
+      >
+        <h1>🎓 Quiz por Matérias PRO</h1>
+
+        {!subject && (
+          <>
+            <h3>Escolha a matéria:</h3>
+
+            {[
+              ["geral", "🌐 Geral"],
+              ["geografia", "🌎 Geografia"],
+              ["portugues", "📝 Português"],
+              ["matematica", "🔢 Matemática"],
+              ["historia", "📜 História"],
+              ["ciencias", "🔬 Ciências"],
+              ["ingles", "🇬🇧 Inglês"],
+              ["informatica", "💻 Informática"],
+              ["educacao", "⚽ Educação Física"],
+            ].map(([key, label]) => (
+              <button
+                key={key}
+                onClick={() => startQuiz(key)}
+                style={{
+                  width: "100%",
+                  padding: 12,
+                  margin: "8px 0",
+                  border: "none",
+                  borderRadius: 6,
+                  cursor: "pointer",
+                  fontSize: 16,
+                  background: "#f5f5f5",
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </>
+        )}
+
+        {subject && !finished && currentQuestion && (
+          <>
+            <div
+              style={{
+                fontSize: 20,
+                fontWeight: "bold",
+                color: "#d32f2f",
+                textAlign: "center",
+                marginBottom: 10,
+              }}
+            >
+              ⏱️ Tempo: {timeLeft}s
+            </div>
+
+            <div
+              style={{
+                width: "100%",
+                height: 10,
+                background: "#ddd",
+                borderRadius: 10,
+                overflow: "hidden",
+                marginBottom: 20,
+              }}
+            >
+              <div
+                style={{
+                  width: `${progress}%`,
+                  height: "100%",
+                  background: "#4CAF50",
+                }}
+              />
+            </div>
+
+            <div
+              style={{
+                marginBottom: 20,
+                fontWeight: "bold",
+              }}
+            >
+              Pontuação: {score}
+            </div>
+
+            <h2>{currentQuestion.pergunta}</h2>
+
+            {currentQuestion.alternativas.map(
+              (alt, index) => {
+                let background = "#f5f5f5";
+                let color = "black";
+
+                if (selected !== null) {
+                  if (
+                    index === currentQuestion.correta
+                  ) {
+                    background = "#4CAF50";
+                    color = "white";
+                  } else if (index === selected) {
+                    background = "#f44336";
+                    color = "white";
+                  }
+                }
+
+                return (
+                  <button
+                    key={index}
+                    disabled={selected !== null}
+                    onClick={() =>
+                      handleAnswer(index)
+                    }
+                    style={{
+                      width: "100%",
+                      padding: 12,
+                      margin: "8px 0",
+                      border: "none",
+                      borderRadius: 6,
+                      cursor: "pointer",
+                      fontSize: 16,
+                      background,
+                      color,
+                    }}
+                  >
+                    {alt}
+                  </button>
+                );
+              }
+            )}
+
+            {selected !== null && (
+              <button
+                onClick={nextQuestion}
+                style={{
+                  width: "100%",
+                  padding: 12,
+                  marginTop: 15,
+                  border: "none",
+                  borderRadius: 6,
+                  cursor: "pointer",
+                  fontSize: 16,
+                  background: "#2196F3",
+                  color: "white",
+                }}
+              >
+                Próxima
+              </button>
+            )}
+          </>
+        )}
+
+        {finished && (
+          <>
+            <h2>🏁 Quiz Finalizado</h2>
+
+            <h3>
+              Você acertou {score}/{questions.length}
+            </h3>
+
+            <h1>
+              {Math.round(
+                (score / questions.length) * 100
+              )}
+              %
+            </h1>
+
+            <h3>
+              🏆 Melhor pontuação:{" "}
+              {
+                localStorage.getItem(
+                  `rank_${subject}`
+                )
+              }
+              %
+            </h3>
+
+            <button
+              onClick={restart}
+              style={{
+                width: "100%",
+                padding: 12,
+                marginTop: 15,
+                border: "none",
+                borderRadius: 6,
+                cursor: "pointer",
+                fontSize: 16,
+                background: "#2196F3",
+                color: "white",
+              }}
+            >
+              Voltar ao Menu
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
