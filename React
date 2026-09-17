@@ -1,435 +1,1840 @@
-import React, { useEffect, useState } from "react";
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-export default function App() {
-  const TIME_LIMIT = 15;
+<title>Quiz por Matérias PRO</title>
 
-  const quizData = {
-    geografia: [
-      {
-        id: 1,
-        pergunta: "Capital do Brasil?",
-        alternativas: ["Rio", "Brasília", "Salvador", "SP"],
-        correta: 1,
-      },
-      {
-        id: 2,
-        pergunta: "Maior continente?",
-        alternativas: ["África", "Europa", "Ásia", "América"],
-        correta: 2,
-      },
-    ],
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-    portugues: [
-      {
-        id: 101,
-        pergunta: "Plural de pão?",
-        alternativas: ["Pãos", "Pães", "Pãons", "Pãeses"],
-        correta: 1,
-      },
-    ],
+:root {
+    --bg: #eef2f7;
+    --card: #ffffff;
+    --text: #172033;
+    --muted: #667085;
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --success: #16a34a;
+    --danger: #dc2626;
+    --warning: #f59e0b;
+    --border: #e5e7eb;
+    --option: #f8fafc;
+    --shadow: 0 15px 40px rgba(15, 23, 42, .12);
+}
 
-    matematica: [
-      {
-        id: 201,
-        pergunta: "5 + 3?",
-        alternativas: ["7", "8", "9", "10"],
-        correta: 1,
-      },
-    ],
+body.dark {
+    --bg: #080b14;
+    --card: #111827;
+    --text: #f8fafc;
+    --muted: #9ca3af;
+    --border: #273244;
+    --option: #182131;
+    --shadow: 0 15px 45px rgba(0, 0, 0, .4);
+}
 
-    historia: [
-      {
-        id: 301,
-        pergunta: "Descobridor do Brasil?",
-        alternativas: ["Cabral", "Colombo", "Vasco", "Magalhães"],
-        correta: 0,
-      },
-    ],
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at top left, rgba(37,99,235,.12), transparent 35%),
+        var(--bg);
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--text);
+    transition: .3s;
+}
 
-    ciencias: [
-      {
-        id: 401,
-        pergunta: "Planeta vermelho?",
-        alternativas: ["Marte", "Terra", "Júpiter", "Vênus"],
-        correta: 0,
-      },
-    ],
+button {
+    font-family: inherit;
+}
 
-    ingles: [
-      {
-        id: 501,
-        pergunta: "House?",
-        alternativas: ["Casa", "Carro", "Mesa", "Porta"],
-        correta: 0,
-      },
-    ],
+.app {
+    width: min(900px, 94%);
+    margin: auto;
+    padding: 25px 0 40px;
+}
 
-    informatica: [
-      {
-        id: 601,
-        pergunta: "CPU é?",
-        alternativas: ["Memória", "Processador", "Tela", "Teclado"],
-        correta: 1,
-      },
-    ],
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
 
-    educacao: [
-      {
-        id: 701,
-        pergunta: "Jogadores no futebol?",
-        alternativas: ["9", "10", "11", "12"],
-        correta: 2,
-      },
-    ],
-  };
+.logo {
+    font-size: 45px;
+    margin-bottom: 8px;
+}
 
-  const [subject, setSubject] = useState("");
-  const [questions, setQuestions] = useState([]);
-  const [current, setCurrent] = useState(0);
-  const [score, setScore] = useState(0);
-  const [selected, setSelected] = useState(null);
-  const [finished, setFinished] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
+.header h1 {
+    font-size: clamp(26px, 5vw, 40px);
+    margin-bottom: 7px;
+}
 
-  function shuffle(array) {
+.header p {
+    color: var(--muted);
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 25px;
+    box-shadow: var(--shadow);
+}
+
+.top-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+}
+
+.theme-btn {
+    border: 1px solid var(--border);
+    background: var(--option);
+    color: var(--text);
+    padding: 9px 13px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.section-title {
+    margin-bottom: 17px;
+}
+
+.subject-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.subject-btn {
+    border: 1px solid var(--border);
+    background: var(--option);
+    color: var(--text);
+    border-radius: 15px;
+    padding: 17px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 16px;
+    transition: .2s;
+}
+
+.subject-btn:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary);
+    background: rgba(37,99,235,.08);
+}
+
+.subject-icon {
+    font-size: 27px;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.subject-name {
+    font-weight: bold;
+}
+
+.subject-record {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.quiz-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 17px;
+    flex-wrap: wrap;
+}
+
+.badge {
+    background: rgba(37,99,235,.12);
+    color: var(--primary);
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.timer {
+    font-size: 21px;
+    font-weight: bold;
+    color: var(--danger);
+}
+
+.timer.warning {
+    animation: pulse .7s infinite;
+}
+
+@keyframes pulse {
+    50% {
+        transform: scale(1.08);
+    }
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 7px;
+}
+
+.progress {
+    height: 10px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 25px;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #2563eb, #7c3aed);
+    transition: width .3s;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.stat {
+    background: var(--option);
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    padding: 12px;
+    text-align: center;
+}
+
+.stat-label {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.stat-value {
+    display: block;
+    font-weight: bold;
+    font-size: 19px;
+    margin-top: 4px;
+}
+
+.question {
+    font-size: clamp(21px, 4vw, 29px);
+    line-height: 1.35;
+    margin-bottom: 22px;
+}
+
+.options {
+    display: grid;
+    gap: 11px;
+}
+
+.option {
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--option);
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    font-size: 16px;
+    transition: .2s;
+}
+
+.option:hover:not(:disabled) {
+    border-color: var(--primary);
+    transform: translateX(3px);
+}
+
+.option:disabled {
+    cursor: default;
+}
+
+.option.correct {
+    background: rgba(22,163,74,.15);
+    border-color: var(--success);
+    color: var(--success);
+    font-weight: bold;
+}
+
+.option.wrong {
+    background: rgba(220,38,38,.15);
+    border-color: var(--danger);
+    color: var(--danger);
+    font-weight: bold;
+}
+
+.feedback {
+    margin-top: 17px;
+    padding: 13px;
+    border-radius: 12px;
+    background: var(--option);
+    border: 1px solid var(--border);
+    line-height: 1.5;
+}
+
+.feedback.success {
+    border-color: var(--success);
+}
+
+.feedback.error {
+    border-color: var(--danger);
+}
+
+.next-btn,
+.primary-btn {
+    width: 100%;
+    border: none;
+    background: linear-gradient(135deg, var(--primary), #7c3aed);
+    color: white;
+    padding: 15px;
+    border-radius: 13px;
+    margin-top: 15px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.next-btn:hover,
+.primary-btn:hover {
+    filter: brightness(1.08);
+}
+
+.menu-btn {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: var(--option);
+    color: var(--text);
+    padding: 14px;
+    border-radius: 13px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+.result {
+    text-align: center;
+}
+
+.result-icon {
+    font-size: 65px;
+    margin-bottom: 10px;
+}
+
+.score-circle {
+    width: 145px;
+    height: 145px;
+    border-radius: 50%;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: var(--option);
+    border: 8px solid var(--primary);
+}
+
+.score-circle strong {
+    font-size: 34px;
+}
+
+.score-circle span {
+    color: var(--muted);
+}
+
+.result-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.result-box {
+    background: var(--option);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 15px;
+}
+
+.result-box strong {
+    display: block;
+    font-size: 22px;
+    margin-bottom: 5px;
+}
+
+.result-box span {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.history {
+    margin-top: 20px;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+}
+
+.empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 20px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 18px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+@media (max-width: 650px) {
+    .app {
+        width: 95%;
+        padding-top: 15px;
+    }
+
+    .card {
+        padding: 18px;
+        border-radius: 18px;
+    }
+
+    .subject-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stats {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .stat {
+        padding: 9px 5px;
+    }
+
+    .stat-value {
+        font-size: 16px;
+    }
+
+    .question {
+        font-size: 22px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <header class="header">
+        <div class="logo">🎓</div>
+        <h1>Quiz por Matérias PRO</h1>
+        <p>Teste seus conhecimentos e bata seus recordes!</p>
+    </header>
+
+    <div class="card">
+
+        <div class="top-actions">
+            <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">
+                🌙
+            </button>
+        </div>
+
+        <!-- MENU -->
+        <section id="menu">
+
+            <h2 class="section-title">📚 Escolha uma matéria</h2>
+
+            <div class="subject-grid">
+
+                <button class="subject-btn" onclick="startQuiz('geral')">
+                    <span class="subject-icon">🌐</span>
+                    <span class="subject-name">Geral</span>
+                    <div class="subject-record" id="record-geral">
+                        Recorde: 0%
+                    </div>
+                </button>
+
+                <button class="subject-btn" onclick="startQuiz('geografia')">
+                    <span class="subject-icon">🌎</span>
+                    <span class="subject-name">Geografia</span>
+                    <div class="subject-record" id="record-geografia">
+                        Recorde: 0%
+                    </div>
+                </button>
+
+                <button class="subject-btn" onclick="startQuiz('portugues')">
+                    <span class="subject-icon">📝</span>
+                    <span class="subject-name">Português</span>
+                    <div class="subject-record" id="record-portugues">
+                        Recorde: 0%
+                    </div>
+                </button>
+
+                <button class="subject-btn" onclick="startQuiz('matematica')">
+                    <span class="subject-icon">🔢</span>
+                    <span class="subject-name">Matemática</span>
+                    <div class="subject-record" id="record-matematica">
+                        Recorde: 0%
+                    </div>
+                </button>
+
+                <button class="subject-btn" onclick="startQuiz('historia')">
+                    <span class="subject-icon">📜</span>
+                    <span class="subject-name">História</span>
+                    <div class="subject-record" id="record-historia">
+                        Recorde: 0%
+                    </div>
+                </button>
+
+                <button class="subject-btn" onclick="startQuiz('ciencias')">
+                    <span class="subject-icon">🔬</span>
+                    <span class="subject-name">Ciências</span>
+                    <div class="subject-record" id="record-ciencias">
+                        Recorde: 0%
+                    </div>
+                </button>
+
+                <button class="subject-btn" onclick="startQuiz('ingles')">
+                    <span class="subject-icon">🇬🇧</span>
+                    <span class="subject-name">Inglês</span>
+                    <div class="subject-record" id="record-ingles">
+                        Recorde: 0%
+                    </div>
+                </button>
+
+                <button class="subject-btn" onclick="startQuiz('informatica')">
+                    <span class="subject-icon">💻</span>
+                    <span class="subject-name">Informática</span>
+                    <div class="subject-record" id="record-informatica">
+                        Recorde: 0%
+                    </div>
+                </button>
+
+                <button class="subject-btn" onclick="startQuiz('educacao')">
+                    <span class="subject-icon">⚽</span>
+                    <span class="subject-name">Educação Física</span>
+                    <div class="subject-record" id="record-educacao">
+                        Recorde: 0%
+                    </div>
+                </button>
+
+            </div>
+
+            <div class="history">
+                <h3>📊 Últimas partidas</h3>
+                <div id="historyList"></div>
+            </div>
+
+        </section>
+
+        <!-- QUIZ -->
+        <section id="quiz" class="hidden">
+
+            <div class="quiz-header">
+                <span class="badge" id="subjectBadge">
+                    MATÉRIA
+                </span>
+
+                <span class="timer" id="timer">
+                    ⏱️ 15s
+                </span>
+            </div>
+
+            <div class="progress-info">
+                <span id="questionNumber">
+                    Questão 1
+                </span>
+
+                <span id="progressPercent">
+                    0%
+                </span>
+            </div>
+
+            <div class="progress">
+                <div
+                    class="progress-bar"
+                    id="progressBar"
+                    style="width:0%"
+                ></div>
+            </div>
+
+            <div class="stats">
+
+                <div class="stat">
+                    <span class="stat-label">Pontos</span>
+                    <span class="stat-value" id="score">
+                        0
+                    </span>
+                </div>
+
+                <div class="stat">
+                    <span class="stat-label">Sequência</span>
+                    <span class="stat-value" id="streak">
+                        0 🔥
+                    </span>
+                </div>
+
+                <div class="stat">
+                    <span class="stat-label">Acertos</span>
+                    <span class="stat-value" id="correctCount">
+                        0
+                    </span>
+                </div>
+
+            </div>
+
+            <h2 class="question" id="questionText"></h2>
+
+            <div class="options" id="options"></div>
+
+            <div id="feedback"></div>
+
+            <button
+                id="nextButton"
+                class="next-btn hidden"
+                onclick="nextQuestion()"
+            >
+                Próxima questão ➜
+            </button>
+
+        </section>
+
+        <!-- RESULTADO -->
+        <section id="result" class="hidden result">
+
+            <div class="result-icon">🏆</div>
+
+            <h2>Quiz Finalizado!</h2>
+
+            <p id="resultSubject"></p>
+
+            <div class="score-circle">
+                <strong id="finalPercent">0%</strong>
+                <span>resultado</span>
+            </div>
+
+            <h3 id="finalMessage"></h3>
+
+            <div class="result-grid">
+
+                <div class="result-box">
+                    <strong id="finalScore">
+                        0
+                    </strong>
+                    <span>Pontos</span>
+                </div>
+
+                <div class="result-box">
+                    <strong id="finalCorrect">
+                        0
+                    </strong>
+                    <span>Acertos</span>
+                </div>
+
+                <div class="result-box">
+                    <strong id="finalWrong">
+                        0
+                    </strong>
+                    <span>Erros</span>
+                </div>
+
+                <div class="result-box">
+                    <strong id="finalStreak">
+                        0
+                    </strong>
+                    <span>Maior sequência</span>
+                </div>
+
+            </div>
+
+            <div id="recordMessage"></div>
+
+            <button class="primary-btn" onclick="restartSame()">
+                🔄 Jogar novamente
+            </button>
+
+            <button class="menu-btn" onclick="backToMenu()">
+                🏠 Voltar ao menu
+            </button>
+
+        </section>
+
+    </div>
+
+    <footer class="footer">
+        Quiz por Matérias PRO • HTML5 • LocalStorage
+    </footer>
+
+</div>
+
+<script>
+
+/* =====================================================
+   CONFIGURAÇÃO
+===================================================== */
+
+const TIME_LIMIT = 15;
+
+let subject = "";
+let questions = [];
+let current = 0;
+
+let score = 0;
+let correctCount = 0;
+let wrongCount = 0;
+
+let streak = 0;
+let maxStreak = 0;
+
+let selected = null;
+let timeLeft = TIME_LIMIT;
+
+let timerInterval = null;
+
+
+/* =====================================================
+   BANCO DE QUESTÕES
+===================================================== */
+
+const quizData = {
+
+geografia: [
+
+{
+id: 1,
+pergunta: "Qual é a capital do Brasil?",
+alternativas: ["Rio de Janeiro", "Brasília", "Salvador", "São Paulo"],
+correta: 1
+},
+
+{
+id: 2,
+pergunta: "Qual é o maior continente do mundo?",
+alternativas: ["África", "Europa", "Ásia", "América"],
+correta: 2
+},
+
+{
+id: 3,
+pergunta: "Qual é o maior oceano do planeta?",
+alternativas: ["Atlântico", "Índico", "Pacífico", "Ártico"],
+correta: 2
+},
+
+{
+id: 4,
+pergunta: "Qual é o maior país da América do Sul em território?",
+alternativas: ["Argentina", "Brasil", "Chile", "Peru"],
+correta: 1
+},
+
+{
+id: 5,
+pergunta: "Qual linha imaginária divide a Terra em hemisférios Norte e Sul?",
+alternativas: ["Trópico de Câncer", "Meridiano de Greenwich", "Linha do Equador", "Trópico de Capricórnio"],
+correta: 2
+},
+
+{
+id: 6,
+pergunta: "Qual é a capital da Argentina?",
+alternativas: ["Lima", "Buenos Aires", "Montevidéu", "Santiago"],
+correta: 1
+}
+
+],
+
+portugues: [
+
+{
+id: 101,
+pergunta: "Qual é o plural de pão?",
+alternativas: ["Pãos", "Pães", "Pãons", "Pãeses"],
+correta: 1
+},
+
+{
+id: 102,
+pergunta: "Qual palavra está escrita corretamente?",
+alternativas: ["Excessão", "Exceção", "Eceção", "Exessão"],
+correta: 1
+},
+
+{
+id: 103,
+pergunta: "Qual é o antônimo de 'rápido'?",
+alternativas: ["Lento", "Forte", "Alto", "Grande"],
+correta: 0
+},
+
+{
+id: 104,
+pergunta: "Qual palavra é um substantivo?",
+alternativas: ["Correr", "Bonito", "Casa", "Rapidamente"],
+correta: 2
+},
+
+{
+id: 105,
+pergunta: "Qual é o plural de cidadão?",
+alternativas: ["Cidadões", "Cidadãos", "Cidadães", "Cidadans"],
+correta: 1
+}
+
+],
+
+matematica: [
+
+{
+id: 201,
+pergunta: "Quanto é 5 + 3?",
+alternativas: ["7", "8", "9", "10"],
+correta: 1
+},
+
+{
+id: 202,
+pergunta: "Quanto é 9 × 6?",
+alternativas: ["42", "48", "54", "56"],
+correta: 2
+},
+
+{
+id: 203,
+pergunta: "Quanto é 100 ÷ 4?",
+alternativas: ["20", "25", "30", "40"],
+correta: 1
+},
+
+{
+id: 204,
+pergunta: "Qual é o resultado de 12²?",
+alternativas: ["124", "144", "154", "164"],
+correta: 1
+},
+
+{
+id: 205,
+pergunta: "Quanto é 15 - 7?",
+alternativas: ["6", "7", "8", "9"],
+correta: 2
+},
+
+{
+id: 206,
+pergunta: "Qual é a metade de 50?",
+alternativas: ["20", "25", "30", "35"],
+correta: 1
+}
+
+],
+
+historia: [
+
+{
+id: 301,
+pergunta: "Quem comandou a expedição portuguesa que chegou ao Brasil em 1500?",
+alternativas: ["Pedro Álvares Cabral", "Cristóvão Colombo", "Vasco da Gama", "Fernão de Magalhães"],
+correta: 0
+},
+
+{
+id: 302,
+pergunta: "Em que ano ocorreu a Independência do Brasil?",
+alternativas: ["1500", "1789", "1822", "1889"],
+correta: 2
+},
+
+{
+id: 303,
+pergunta: "Qual acontecimento ocorreu em 1889 no Brasil?",
+alternativas: ["Independência", "Proclamação da República", "Descobrimento", "Abolição"],
+correta: 1
+},
+
+{
+id: 304,
+pergunta: "Quem foi conhecido como Tiradentes?",
+alternativas: ["Joaquim José da Silva Xavier", "José Bonifácio", "Duque de Caxias", "Dom Pedro I"],
+correta: 0
+},
+
+{
+id: 305,
+pergunta: "Qual civilização construiu Machu Picchu?",
+alternativas: ["Maia", "Inca", "Egípcia", "Romana"],
+correta: 1
+}
+
+],
+
+ciencias: [
+
+{
+id: 401,
+pergunta: "Qual é conhecido como o planeta vermelho?",
+alternativas: ["Marte", "Terra", "Júpiter", "Vênus"],
+correta: 0
+},
+
+{
+id: 402,
+pergunta: "Qual órgão bombeia o sangue pelo corpo?",
+alternativas: ["Pulmão", "Cérebro", "Coração", "Fígado"],
+correta: 2
+},
+
+{
+id: 403,
+pergunta: "Qual gás é essencial para a respiração humana?",
+alternativas: ["Oxigênio", "Hélio", "Nitrogênio", "Hidrogênio"],
+correta: 0
+},
+
+{
+id: 404,
+pergunta: "Qual é o satélite natural da Terra?",
+alternativas: ["Sol", "Lua", "Marte", "Vênus"],
+correta: 1
+},
+
+{
+id: 405,
+pergunta: "Qual é a fórmula química da água?",
+alternativas: ["CO2", "O2", "H2O", "NaCl"],
+correta: 2
+}
+
+],
+
+ingles: [
+
+{
+id: 501,
+pergunta: "O que significa 'House'?",
+alternativas: ["Casa", "Carro", "Mesa", "Porta"],
+correta: 0
+},
+
+{
+id: 502,
+pergunta: "O que significa 'Book'?",
+alternativas: ["Caneta", "Livro", "Caderno", "Escola"],
+correta: 1
+},
+
+{
+id: 503,
+pergunta: "O que significa 'Water'?",
+alternativas: ["Fogo", "Água", "Terra", "Ar"],
+correta: 1
+},
+
+{
+id: 504,
+pergunta: "O que significa 'Good morning'?",
+alternativas: ["Boa noite", "Boa tarde", "Bom dia", "Até logo"],
+correta: 2
+},
+
+{
+id: 505,
+pergunta: "O que significa 'Friend'?",
+alternativas: ["Professor", "Amigo", "Irmão", "Vizinho"],
+correta: 1
+}
+
+],
+
+informatica: [
+
+{
+id: 601,
+pergunta: "O que significa CPU?",
+alternativas: ["Memória", "Unidade Central de Processamento", "Tela", "Teclado"],
+correta: 1
+},
+
+{
+id: 602,
+pergunta: "Qual dispositivo é usado para digitar textos?",
+alternativas: ["Mouse", "Monitor", "Teclado", "Impressora"],
+correta: 2
+},
+
+{
+id: 603,
+pergunta: "Qual linguagem é usada para estruturar páginas web?",
+alternativas: ["HTML", "SQL", "Python", "C"],
+correta: 0
+},
+
+{
+id: 604,
+pergunta: "Qual linguagem é usada principalmente para estilizar páginas web?",
+alternativas: ["CSS", "HTML", "SQL", "Java"],
+correta: 0
+},
+
+{
+id: 605,
+pergunta: "Qual tecnologia permite adicionar interatividade a páginas web?",
+alternativas: ["JavaScript", "CSS", "HTML", "XML"],
+correta: 0
+}
+
+],
+
+educacao: [
+
+{
+id: 701,
+pergunta: "Quantos jogadores cada equipe começa tendo em campo no futebol?",
+alternativas: ["9", "10", "11", "12"],
+correta: 2
+},
+
+{
+id: 702,
+pergunta: "Qual esporte utiliza uma cesta?",
+alternativas: ["Basquete", "Tênis", "Natação", "Vôlei"],
+correta: 0
+},
+
+{
+id: 703,
+pergunta: "Quantos jogadores formam uma equipe de vôlei em quadra?",
+alternativas: ["5", "6", "7", "8"],
+correta: 1
+},
+
+{
+id: 704,
+pergunta: "Qual esporte é praticado em uma piscina?",
+alternativas: ["Natação", "Futebol", "Judô", "Ciclismo"],
+correta: 0
+},
+
+{
+id: 705,
+pergunta: "Qual esporte utiliza uma raquete e uma rede?",
+alternativas: ["Tênis", "Futebol", "Boxe", "Atletismo"],
+correta: 0
+}
+
+]
+
+};
+
+
+/* =====================================================
+   FUNÇÕES
+===================================================== */
+
+function shuffle(array) {
+
     const arr = [...array];
 
     for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
 
-      [arr[i], arr[j]] = [arr[j], arr[i]];
+        const j = Math.floor(Math.random() * (i + 1));
+
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+
     }
 
     return arr;
-  }
+}
 
-  function getQuestions(subject) {
-    let all = [];
 
-    if (subject === "geral") {
-      all = Object.values(quizData).flat();
-    } else {
-      all = quizData[subject];
-    }
+function getAllQuestions() {
 
-    const key = `used_${subject}`;
+    return Object.values(quizData).flat();
 
-    let usedIds = JSON.parse(
-      localStorage.getItem(key) || "[]"
+}
+
+
+function getQuestions(sub) {
+
+    let all = sub === "geral"
+        ? getAllQuestions()
+        : quizData[sub];
+
+    const key = "used_" + sub;
+
+    let used = JSON.parse(
+        localStorage.getItem(key) || "[]"
     );
 
     let unused = all.filter(
-      (q) => !usedIds.includes(q.id)
+        question => !used.includes(question.id)
     );
 
     if (unused.length === 0) {
-      localStorage.removeItem(key);
-      unused = all;
+
+        localStorage.removeItem(key);
+
+        unused = all;
+
     }
 
     return shuffle(unused);
-  }
 
-  function startQuiz(sub) {
-    setSubject(sub);
-    setQuestions(getQuestions(sub));
-    setCurrent(0);
-    setScore(0);
-    setSelected(null);
-    setFinished(false);
-    setTimeLeft(TIME_LIMIT);
-  }
+}
 
-  const currentQuestion = questions[current];
 
-  useEffect(() => {
-    if (!subject) return;
+/* =====================================================
+   INICIAR QUIZ
+===================================================== */
 
-    if (selected !== null) return;
+function startQuiz(sub) {
 
-    if (finished) return;
+    subject = sub;
 
-    if (timeLeft <= 0) {
-      handleAnswer(-1);
-      return;
-    }
+    questions = getQuestions(sub);
 
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => prev - 1);
+    current = 0;
+
+    score = 0;
+    correctCount = 0;
+    wrongCount = 0;
+
+    streak = 0;
+    maxStreak = 0;
+
+    selected = null;
+
+    document.getElementById("menu")
+        .classList.add("hidden");
+
+    document.getElementById("result")
+        .classList.add("hidden");
+
+    document.getElementById("quiz")
+        .classList.remove("hidden");
+
+    document.getElementById("subjectBadge")
+        .textContent = getSubjectName(sub);
+
+    showQuestion();
+
+}
+
+
+/* =====================================================
+   MOSTRAR QUESTÃO
+===================================================== */
+
+function showQuestion() {
+
+    clearInterval(timerInterval);
+
+    selected = null;
+
+    timeLeft = TIME_LIMIT;
+
+    const question = questions[current];
+
+    document.getElementById("questionText")
+        .textContent = question.pergunta;
+
+    document.getElementById("questionNumber")
+        .textContent =
+        `Questão ${current + 1} de ${questions.length}`;
+
+    const progress =
+        ((current + 1) / questions.length) * 100;
+
+    document.getElementById("progressBar")
+        .style.width = progress + "%";
+
+    document.getElementById("progressPercent")
+        .textContent = Math.round(progress) + "%";
+
+    document.getElementById("score")
+        .textContent = score;
+
+    document.getElementById("streak")
+        .textContent = streak + " 🔥";
+
+    document.getElementById("correctCount")
+        .textContent = correctCount;
+
+    const options =
+        document.getElementById("options");
+
+    options.innerHTML = "";
+
+    document.getElementById("feedback")
+        .innerHTML = "";
+
+    document.getElementById("nextButton")
+        .classList.add("hidden");
+
+    question.alternativas.forEach(
+        (alternative, index) => {
+
+            const button =
+                document.createElement("button");
+
+            button.className = "option";
+
+            button.textContent =
+                `${String.fromCharCode(65 + index)}) ${alternative}`;
+
+            button.onclick =
+                () => handleAnswer(index);
+
+            options.appendChild(button);
+
+        }
+    );
+
+    updateTimer();
+
+    timerInterval = setInterval(() => {
+
+        timeLeft--;
+
+        updateTimer();
+
+        if (timeLeft <= 0) {
+
+            clearInterval(timerInterval);
+
+            handleAnswer(-1);
+
+        }
+
     }, 1000);
 
-    return () => clearInterval(timer);
-  }, [timeLeft, selected, finished]);
+}
 
-  function handleAnswer(index) {
+
+/* =====================================================
+   TIMER
+===================================================== */
+
+function updateTimer() {
+
+    const timer =
+        document.getElementById("timer");
+
+    timer.textContent =
+        `⏱️ ${timeLeft}s`;
+
+    timer.classList.toggle(
+        "warning",
+        timeLeft <= 5
+    );
+
+}
+
+
+/* =====================================================
+   RESPONDER
+===================================================== */
+
+function handleAnswer(index) {
+
     if (selected !== null) return;
 
-    setSelected(index);
+    selected = index;
 
-    const correct = currentQuestion.correta;
+    clearInterval(timerInterval);
 
-    const key = `used_${subject}`;
+    const question = questions[current];
 
-    let usedIds = JSON.parse(
-      localStorage.getItem(key) || "[]"
+    const buttons =
+        document.querySelectorAll(".option");
+
+    buttons.forEach(
+        button => button.disabled = true
     );
 
-    usedIds.push(currentQuestion.id);
+    buttons[question.correta]
+        .classList.add("correct");
+
+    const correct =
+        index === question.correta;
+
+    const feedback =
+        document.getElementById("feedback");
+
+    if (correct) {
+
+        correctCount++;
+
+        streak++;
+
+        if (streak > maxStreak) {
+            maxStreak = streak;
+        }
+
+        /*
+         Bônus:
+         base = 100
+         velocidade = até +50
+         sequência = até +100
+        */
+
+        const speedBonus =
+            Math.max(0, timeLeft * 3);
+
+        const streakBonus =
+            Math.min(streak * 10, 100);
+
+        const points =
+            100 + speedBonus + streakBonus;
+
+        score += points;
+
+        feedback.className =
+            "feedback success";
+
+        feedback.innerHTML =
+            `✅ <strong>Resposta correta!</strong><br>
+             +${points} pontos`;
+
+        buttons[index]
+            .classList.add("correct");
+
+    } else {
+
+        wrongCount++;
+
+        streak = 0;
+
+        if (index >= 0) {
+
+            buttons[index]
+                .classList.add("wrong");
+
+        }
+
+        feedback.className =
+            "feedback error";
+
+        feedback.innerHTML =
+            index === -1
+                ? `⏰ <strong>Tempo esgotado!</strong><br>
+                   A resposta correta era:
+                   <strong>${question.alternativas[question.correta]}</strong>`
+                : `❌ <strong>Resposta incorreta.</strong><br>
+                   A resposta correta era:
+                   <strong>${question.alternativas[question.correta]}</strong>`;
+
+    }
+
+    saveUsedQuestion(question.id);
+
+    document.getElementById("score")
+        .textContent = score;
+
+    document.getElementById("streak")
+        .textContent = streak + " 🔥";
+
+    document.getElementById("correctCount")
+        .textContent = correctCount;
+
+    document.getElementById("nextButton")
+        .classList.remove("hidden");
+
+}
+
+
+/* =====================================================
+   SALVAR QUESTÃO USADA
+===================================================== */
+
+function saveUsedQuestion(id) {
+
+    const key = "used_" + subject;
+
+    let used =
+        JSON.parse(
+            localStorage.getItem(key) || "[]"
+        );
+
+    if (!used.includes(id)) {
+
+        used.push(id);
+
+        localStorage.setItem(
+            key,
+            JSON.stringify(used)
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   PRÓXIMA
+===================================================== */
+
+function nextQuestion() {
+
+    current++;
+
+    if (current >= questions.length) {
+
+        finishQuiz();
+
+        return;
+
+    }
+
+    showQuestion();
+
+}
+
+
+/* =====================================================
+   FINALIZAR
+===================================================== */
+
+function finishQuiz() {
+
+    clearInterval(timerInterval);
+
+    document.getElementById("quiz")
+        .classList.add("hidden");
+
+    document.getElementById("result")
+        .classList.remove("hidden");
+
+    const percent =
+        Math.round(
+            (correctCount / questions.length) * 100
+        );
+
+    const previousRecord =
+        Number(
+            localStorage.getItem(
+                "rank_" + subject
+            )
+        ) || 0;
+
+    const newRecord =
+        percent > previousRecord;
+
+    if (newRecord) {
+
+        localStorage.setItem(
+            "rank_" + subject,
+            percent
+        );
+
+    }
+
+    document.getElementById("resultSubject")
+        .textContent =
+        getSubjectName(subject);
+
+    document.getElementById("finalPercent")
+        .textContent = percent + "%";
+
+    document.getElementById("finalScore")
+        .textContent = score;
+
+    document.getElementById("finalCorrect")
+        .textContent = correctCount;
+
+    document.getElementById("finalWrong")
+        .textContent = wrongCount;
+
+    document.getElementById("finalStreak")
+        .textContent = maxStreak;
+
+    document.getElementById("finalMessage")
+        .textContent =
+        getResultMessage(percent);
+
+    document.getElementById("recordMessage")
+        .innerHTML =
+        newRecord
+            ? "🏆 <strong>Novo recorde!</strong>"
+            : `🏅 Seu recorde: ${Math.max(previousRecord, percent)}%`;
+
+    saveHistory(percent);
+
+    loadRecords();
+
+    loadHistory();
+
+}
+
+
+/* =====================================================
+   MENSAGEM
+===================================================== */
+
+function getResultMessage(percent) {
+
+    if (percent === 100)
+        return "🌟 Perfeito! Você acertou tudo!";
+
+    if (percent >= 80)
+        return "🔥 Excelente desempenho!";
+
+    if (percent >= 60)
+        return "👏 Muito bom! Continue treinando.";
+
+    if (percent >= 40)
+        return "💪 Bom começo! Você pode melhorar.";
+
+    return "📚 Continue estudando e tente novamente.";
+
+}
+
+
+/* =====================================================
+   NOMES
+===================================================== */
+
+function getSubjectName(sub) {
+
+    const names = {
+
+        geral: "🌐 Quiz Geral",
+
+        geografia: "🌎 Geografia",
+
+        portugues: "📝 Português",
+
+        matematica: "🔢 Matemática",
+
+        historia: "📜 História",
+
+        ciencias: "🔬 Ciências",
+
+        ingles: "🇬🇧 Inglês",
+
+        informatica: "💻 Informática",
+
+        educacao: "⚽ Educação Física"
+
+    };
+
+    return names[sub] || sub;
+
+}
+
+
+/* =====================================================
+   HISTÓRICO
+===================================================== */
+
+function saveHistory(percent) {
+
+    let history =
+        JSON.parse(
+            localStorage.getItem("quiz_history") || "[]"
+        );
+
+    history.unshift({
+
+        subject: getSubjectName(subject),
+
+        percent,
+
+        score,
+
+        date:
+            new Date().toLocaleString("pt-BR")
+
+    });
+
+    history =
+        history.slice(0, 8);
 
     localStorage.setItem(
-      key,
-      JSON.stringify(usedIds)
+        "quiz_history",
+        JSON.stringify(history)
     );
 
-    if (index === correct) {
-      setScore((prev) => prev + 1);
-    }
-  }
-
-  function nextQuestion() {
-    if (current + 1 < questions.length) {
-      setCurrent((prev) => prev + 1);
-      setSelected(null);
-      setTimeLeft(TIME_LIMIT);
-    } else {
-      setFinished(true);
-
-      const percent = Math.round(
-        (score / questions.length) * 100
-      );
-
-      const rankKey = `rank_${subject}`;
-
-      const best =
-        Number(localStorage.getItem(rankKey)) || 0;
-
-      if (percent > best) {
-        localStorage.setItem(rankKey, percent);
-      }
-    }
-  }
-
-  function restart() {
-    setSubject("");
-    setQuestions([]);
-    setCurrent(0);
-    setScore(0);
-    setSelected(null);
-    setFinished(false);
-  }
-
-  const progress =
-    questions.length > 0
-      ? ((current + 1) / questions.length) * 100
-      : 0;
-
-  return (
-    <div
-      style={{
-        background: "#eef2f7",
-        minHeight: "100vh",
-        padding: 20,
-        fontFamily: "Arial",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: 700,
-          margin: "auto",
-          background: "white",
-          padding: 20,
-          borderRadius: 10,
-          boxShadow: "0 0 15px rgba(0,0,0,.15)",
-        }}
-      >
-        <h1>🎓 Quiz por Matérias PRO</h1>
-
-        {!subject && (
-          <>
-            <h3>Escolha a matéria:</h3>
-
-            {[
-              ["geral", "🌐 Geral"],
-              ["geografia", "🌎 Geografia"],
-              ["portugues", "📝 Português"],
-              ["matematica", "🔢 Matemática"],
-              ["historia", "📜 História"],
-              ["ciencias", "🔬 Ciências"],
-              ["ingles", "🇬🇧 Inglês"],
-              ["informatica", "💻 Informática"],
-              ["educacao", "⚽ Educação Física"],
-            ].map(([key, label]) => (
-              <button
-                key={key}
-                onClick={() => startQuiz(key)}
-                style={{
-                  width: "100%",
-                  padding: 12,
-                  margin: "8px 0",
-                  border: "none",
-                  borderRadius: 6,
-                  cursor: "pointer",
-                  fontSize: 16,
-                  background: "#f5f5f5",
-                }}
-              >
-                {label}
-              </button>
-            ))}
-          </>
-        )}
-
-        {subject && !finished && currentQuestion && (
-          <>
-            <div
-              style={{
-                fontSize: 20,
-                fontWeight: "bold",
-                color: "#d32f2f",
-                textAlign: "center",
-                marginBottom: 10,
-              }}
-            >
-              ⏱️ Tempo: {timeLeft}s
-            </div>
-
-            <div
-              style={{
-                width: "100%",
-                height: 10,
-                background: "#ddd",
-                borderRadius: 10,
-                overflow: "hidden",
-                marginBottom: 20,
-              }}
-            >
-              <div
-                style={{
-                  width: `${progress}%`,
-                  height: "100%",
-                  background: "#4CAF50",
-                }}
-              />
-            </div>
-
-            <div
-              style={{
-                marginBottom: 20,
-                fontWeight: "bold",
-              }}
-            >
-              Pontuação: {score}
-            </div>
-
-            <h2>{currentQuestion.pergunta}</h2>
-
-            {currentQuestion.alternativas.map(
-              (alt, index) => {
-                let background = "#f5f5f5";
-                let color = "black";
-
-                if (selected !== null) {
-                  if (
-                    index === currentQuestion.correta
-                  ) {
-                    background = "#4CAF50";
-                    color = "white";
-                  } else if (index === selected) {
-                    background = "#f44336";
-                    color = "white";
-                  }
-                }
-
-                return (
-                  <button
-                    key={index}
-                    disabled={selected !== null}
-                    onClick={() =>
-                      handleAnswer(index)
-                    }
-                    style={{
-                      width: "100%",
-                      padding: 12,
-                      margin: "8px 0",
-                      border: "none",
-                      borderRadius: 6,
-                      cursor: "pointer",
-                      fontSize: 16,
-                      background,
-                      color,
-                    }}
-                  >
-                    {alt}
-                  </button>
-                );
-              }
-            )}
-
-            {selected !== null && (
-              <button
-                onClick={nextQuestion}
-                style={{
-                  width: "100%",
-                  padding: 12,
-                  marginTop: 15,
-                  border: "none",
-                  borderRadius: 6,
-                  cursor: "pointer",
-                  fontSize: 16,
-                  background: "#2196F3",
-                  color: "white",
-                }}
-              >
-                Próxima
-              </button>
-            )}
-          </>
-        )}
-
-        {finished && (
-          <>
-            <h2>🏁 Quiz Finalizado</h2>
-
-            <h3>
-              Você acertou {score}/{questions.length}
-            </h3>
-
-            <h1>
-              {Math.round(
-                (score / questions.length) * 100
-              )}
-              %
-            </h1>
-
-            <h3>
-              🏆 Melhor pontuação:{" "}
-              {
-                localStorage.getItem(
-                  `rank_${subject}`
-                )
-              }
-              %
-            </h3>
-
-            <button
-              onClick={restart}
-              style={{
-                width: "100%",
-                padding: 12,
-                marginTop: 15,
-                border: "none",
-                borderRadius: 6,
-                cursor: "pointer",
-                fontSize: 16,
-                background: "#2196F3",
-                color: "white",
-              }}
-            >
-              Voltar ao Menu
-            </button>
-          </>
-        )}
-      </div>
-    </div>
-  );
 }
+
+
+function loadHistory() {
+
+    const container =
+        document.getElementById("historyList");
+
+    let history =
+        JSON.parse(
+            localStorage.getItem("quiz_history") || "[]"
+        );
+
+    if (!history.length) {
+
+        container.innerHTML =
+            `<div class="empty">
+                Nenhuma partida registrada.
+            </div>`;
+
+        return;
+
+    }
+
+    container.innerHTML =
+        history.map(item => `
+
+            <div class="history-item">
+
+                <span>
+                    ${item.subject}<br>
+                    <small>${item.date}</small>
+                </span>
+
+                <strong>
+                    ${item.percent}%<br>
+                    ${item.score} pts
+                </strong>
+
+            </div>
+
+        `).join("");
+
+}
+
+
+/* =====================================================
+   RECORDES
+===================================================== */
+
+function loadRecords() {
+
+    const subjects = [
+
+        "geral",
+        "geografia",
+        "portugues",
+        "matematica",
+        "historia",
+        "ciencias",
+        "ingles",
+        "informatica",
+        "educacao"
+
+    ];
+
+    subjects.forEach(sub => {
+
+        const element =
+            document.getElementById(
+                "record-" + sub
+            );
+
+        if (!element) return;
+
+        const record =
+            Number(
+                localStorage.getItem(
+                    "rank_" + sub
+                )
+            ) || 0;
+
+        element.textContent =
+            `Recorde: ${record}%`;
+
+    });
+
+}
+
+
+/* =====================================================
+   REINICIAR
+===================================================== */
+
+function restartSame() {
+
+    startQuiz(subject);
+
+}
+
+
+function backToMenu() {
+
+    clearInterval(timerInterval);
+
+    document.getElementById("quiz")
+        .classList.add("hidden");
+
+    document.getElementById("result")
+        .classList.add("hidden");
+
+    document.getElementById("menu")
+        .classList.remove("hidden");
+
+    subject = "";
+
+    questions = [];
+
+    loadRecords();
+
+    loadHistory();
+
+}
+
+
+/* =====================================================
+   TEMA
+===================================================== */
+
+function toggleTheme() {
+
+    document.body.classList.toggle("dark");
+
+    const dark =
+        document.body.classList.contains("dark");
+
+    localStorage.setItem(
+        "quiz_theme",
+        dark ? "dark" : "light"
+    );
+
+    document.getElementById("themeBtn")
+        .textContent =
+        dark ? "☀️" : "🌙";
+
+}
+
+
+function loadTheme() {
+
+    const theme =
+        localStorage.getItem("quiz_theme");
+
+    if (theme === "dark") {
+
+        document.body.classList.add("dark");
+
+        document.getElementById("themeBtn")
+            .textContent = "☀️";
+
+    }
+
+}
+
+
+/* =====================================================
+   SOM
+===================================================== */
+
+function playSound(type) {
+
+    try {
+
+        const AudioContext =
+            window.AudioContext ||
+            window.webkitAudioContext;
+
+        const ctx =
+            new AudioContext();
+
+        const oscillator =
+            ctx.createOscillator();
+
+        const gain =
+            ctx.createGain();
+
+        oscillator.connect(gain);
+
+        gain.connect(ctx.destination);
+
+        oscillator.frequency.value =
+            type === "correct"
+                ? 700
+                : 180;
+
+        oscillator.type = "sine";
+
+        gain.gain.setValueAtTime(
+            0.08,
+            ctx.currentTime
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            0.001,
+            ctx.currentTime + .25
+        );
+
+        oscillator.start();
+
+        oscillator.stop(
+            ctx.currentTime + .25
+        );
+
+    } catch (error) {
+
+        console.log("Áudio indisponível.");
+
+    }
+
+}
+
+
+/* =====================================================
+   PATCH DO SOM
+===================================================== */
+
+const originalHandleAnswer =
+    handleAnswer;
+
+handleAnswer = function(index) {
+
+    const question =
+        questions[current];
+
+    if (selected !== null) return;
+
+    playSound(
+        index === question.correta
+            ? "correct"
+            : "wrong"
+    );
+
+    originalHandleAnswer(index);
+
+};
+
+
+/* =====================================================
+   INICIALIZAÇÃO
+===================================================== */
+
+loadTheme();
+
+loadRecords();
+
+loadHistory();
+
+</script>
+
+</body>
+</html>
+```
