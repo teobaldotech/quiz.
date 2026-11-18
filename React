@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta name="theme-color" content="#111827">
-<title>Quiz por Matérias PRO ULTRA</title>
+<title>Quiz APMOB PRO ULTRA</title>
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -114,9 +114,6 @@ button{cursor:pointer}
  margin-bottom:15px;
 }
 
-/* ==========================================================
- NOVA CAPA / HOME COM BOTÕES DE ACESSO RÁPIDO
-========================================================== */
 .cover-screen{
  text-align:center;
  padding:10px 0 20px;
@@ -393,14 +390,21 @@ input:focus,select:focus{border-color:var(--primary)}
 
 .feedback{
  margin-top:15px;
- padding:13px;
+ padding:15px;
  border-radius:12px;
  background:var(--option);
  border:1px solid var(--border);
- line-height:1.5;
+ line-height:1.6;
 }
 .feedback.success{border-color:var(--success)}
 .feedback.error{border-color:var(--danger)}
+.feedback-explanation{
+ margin-top:8px;
+ font-size:14px;
+ color:var(--muted);
+ border-top:1px dashed var(--border);
+ padding-top:8px;
+}
 
 .quiz-tools{
  display:grid;
@@ -566,8 +570,8 @@ input:focus,select:focus{border-color:var(--primary)}
 
 <header class="header">
  <div class="logo">🎓</div>
- <h1>Quiz por Matérias PRO ULTRA</h1>
- <p>Treine, evolua, conquiste XP e bata seus recordes.</p>
+ <h1>Quiz APMOB PRO ULTRA</h1>
+ <p>Treine, evolua, conquiste XP e bata seus recordes com explicações detalhadas.</p>
 </header>
 
 <div class="card">
@@ -583,10 +587,7 @@ input:focus,select:focus{border-color:var(--primary)}
  <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
 </div>
 
-
-<!-- ==========================================================
- CAPA / TELA INICIAL COM BOTOES DE ACESSO
-========================================================== -->
+<!-- CAPA / TELA INICIAL -->
 <section id="coverScreen" class="cover-screen">
  <div class="cover-banner">
   <h2>Pronto para testar seus conhecimentos?</h2>
@@ -609,7 +610,6 @@ input:focus,select:focus{border-color:var(--primary)}
   </div>
  </div>
 </section>
-
 
 <!-- MENU DE MATÉRIAS E CONFIGURAÇÕES -->
 <section id="menu" class="hidden">
@@ -711,7 +711,6 @@ input:focus,select:focus{border-color:var(--primary)}
 
 </section>
 
-
 <!-- QUIZ -->
 <section id="quiz" class="hidden">
 <div class="quiz-header">
@@ -753,7 +752,6 @@ input:focus,select:focus{border-color:var(--primary)}
 <button id="nextButton" class="next-btn hidden" onclick="nextQuestion()">Próxima questão ➜</button>
 </section>
 
-
 <!-- RESULTADO -->
 <section id="result" class="hidden result">
 <div class="result-icon">🏆</div>
@@ -783,11 +781,10 @@ input:focus,select:focus{border-color:var(--primary)}
 </div>
 
 <footer class="footer">
-Quiz por Matérias PRO ULTRA • HTML5 • LocalStorage • Offline
+Quiz APMOB PRO ULTRA • HTML5 • Explicações Detalhadas • Offline
 </footer>
 
 </div>
-
 
 <script>
 const DEFAULT_TIME=15;
@@ -812,41 +809,41 @@ let skipUsed=false;
 
 const quizData={
 geografia:[
-{id:1,d:"facil",p:"Qual é a capital do Brasil?",a:["Rio de Janeiro","Brasília","Salvador","São Paulo"],c:1},
-{id:2,d:"facil",p:"Qual é o maior continente do mundo?",a:["África","Europa","Ásia","Oceania"],c:2},
-{id:3,d:"medio",p:"Qual é o maior oceano do planeta?",a:["Atlântico","Índico","Pacífico","Ártico"],c:2},
-{id:4,d:"facil",p:"Qual é o maior país da América do Sul em território?",a:["Argentina","Brasil","Chile","Peru"],c:1},
-{id:5,d:"facil",p:"Qual linha imaginária divide a Terra em hemisférios Norte e Sul?",a:["Trópico de Câncer","Greenwich","Linha do Equador","Trópico de Capricórnio"],c:2}
+{id:1,d:"facil",p:"Qual é a capital do Brasil?",a:["Rio de Janeiro","Brasília","Salvador","São Paulo"],c:1,e:"Brasília foi planejada e inaugurada em 21 de abril de 1960, substituindo o Rio de Janeiro como capital federal."},
+{id:2,d:"facil",p:"Qual é o maior continente do mundo em área e população?",a:["África","Europa","Ásia","Oceania"],c:2,e:"A Ásia abrange cerca de 30% da área terrestre mundial e abriga mais de 60% da população global."},
+{id:3,d:"medio",p:"Qual é o maior oceano do planeta?",a:["Atlântico","Índico","Pacífico","Ártico"],c:2,e:"O Oceano Pacífico cobre mais de 30% da superfície da Terra, sendo maior que toda a área de terra seca somada."},
+{id:4,d:"facil",p:"Qual é o país com maior extensão territorial da América do Sul?",a:["Argentina","Brasil","Chile","Peru"],c:1,e:"O Brasil possui mais de 8,5 milhões de km², ocupando quase metade do subcontinente sul-americano."},
+{id:5,d:"medio",p:"Qual linha imaginária divide a Terra em hemisférios Norte e Sul?",a:["Trópico de Câncer","Greenwich","Linha do Equador","Trópico de Capricórnio"],c:2,e:"A Linha do Equador é o paralelo de latitude 0° que serve de referência principal para a cartografia global."}
 ],
 portugues:[
-{id:101,d:"facil",p:"Qual é o plural de pão?",a:["Pãos","Pães","Pãons","Pãeses"],c:1},
-{id:102,d:"medio",p:"Qual palavra está escrita corretamente?",a:["Excessão","Exceção","Eceção","Exessão"],c:1},
-{id:103,d:"facil",p:"Qual é o antônimo de 'rápido'?",a:["Lento","Forte","Alto","Grande"],c:0}
+{id:101,d:"facil",p:"Qual é a forma correta do plural da palavra 'pão'?",a:["Pãos","Pães","Pãons","Pãeses"],c:1,e:"Terminados em -ão, grande parte dos substantivos faz o plural mudando para -ães (como pão/pães, cão/cães)."},
+{id:102,d:"medio",p:"Assinale a alternativa em que a palavra está grafada corretamente:",a:["Excessão","Exceção","Eceção","Exessão"],c:1,e:"A palavra correta é 'exceção', derivada do latim exceptione, grafada com 'xc' e 'ç'."},
+{id:103,d:"facil",p:"Qual é o antônimo exato da palavra 'rápido'?",a:["Lento","Forte","Alto","Grande"],c:0,e:"Antônimos são palavras de sentidos opostos. O oposto de rápido é lento ou devagar."}
 ],
 matematica:[
-{id:201,d:"facil",p:"Quanto é 5 + 3?",a:["7","8","9","10"],c:1},
-{id:202,d:"facil",p:"Quanto é 9 × 6?",a:["42","48","54","56"],c:2},
-{id:203,d:"facil",p:"Quanto é 100 ÷ 4?",a:["20","25","30","40"],c:1}
+{id:201,d:"facil",p:"Quanto é a soma de 15 com 27?",a:["38","40","42","44"],c:2,e:"15 + 27 = 42. Somando as unidades (5 + 7 = 12) e dezenas (10 + 20 + 10 = 40)."},
+{id:202,d:"facil",p:"Quanto é o produto de 9 multiplicado por 6?",a:["42","48","54","56"],c:2,e:"9 × 6 = 54. Tabuada básica de multiplicação."},
+{id:203,d:"medio",p:"Qual é o resultado de 144 dividido por 12?",a:["10","11","12","14"],c:2,e:"12 × 12 = 144, portanto 144 ÷ 12 = 12."}
 ],
 historia:[
-{id:301,d:"facil",p:"Quem comandou a expedição portuguesa que chegou ao Brasil em 1500?",a:["Pedro Álvares Cabral","Cristóvão Colombo","Vasco da Gama","Fernão de Magalhães"],c:0},
-{id:302,d:"facil",p:"Em que ano ocorreu a Independência do Brasil?",a:["1500","1789","1822","1889"],c:2}
+{id:301,d:"facil",p:"Quem comandou a expedição portuguesa que chegou ao litoral brasileiro em 1500?",a:["Pedro Álvares Cabral","Cristóvão Colombo","Vasco da Gama","Fernão de Magalhães"],c:0,e:"Pedro Álvares Cabral liderou a esquadra que aportou em Porto Seguro (BA) em 22 de abril de 1500."},
+{id:302,d:"facil",p:"Em que ano ocorreu a Proclamação da Independência do Brasil?",a:["1500","1789","1822","1889"],c:2,e:"A independência foi proclamada por Dom Pedro I às margens do rio Ipiranga em 7 de setembro de 1822."}
 ],
 ciencias:[
-{id:401,d:"facil",p:"Qual é conhecido como o planeta vermelho?",a:["Marte","Terra","Júpiter","Vênus"],c:0},
-{id:402,d:"facil",p:"Qual órgão bombeia o sangue pelo corpo?",a:["Pulmão","Cérebro","Coração","Fígado"],c:2}
+{id:401,d:"facil",p:"Qual planeta do Sistema Solar é conhecido como o Planeta Vermelho?",a:["Marte","Terra","Júpiter","Vênus"],c:0,e:"Marte tem esse apelido devido à alta concentração de óxido de ferro (ferrugem) em sua superfície."},
+{id:402,d:"facil",p:"Qual órgão do corpo humano é responsável por bombear o sangue?",a:["Pulmão","Cérebro","Coração","Fígado"],c:2,e:"O coração atua como uma bomba muscular impulsionando o sangue por todo o sistema circulatório."}
 ],
 ingles:[
-{id:501,d:"facil",p:"O que significa 'House'?",a:["Casa","Carro","Mesa","Porta"],c:0},
-{id:502,d:"facil",p:"O que significa 'Book'?",a:["Caneta","Livro","Caderno","Escola"],c:1}
+{id:501,d:"facil",p:"O que a palavra em inglês 'House' significa em português?",a:["Casa","Carro","Mesa","Porta"],c:0,e:"'House' significa casa ou residência. Carro em inglês é 'car'."},
+{id:502,d:"facil",p:"O que significa a palavra 'Book'?",a:["Caneta","Livro","Caderno","Escola"],c:1,e:"'Book' significa livro. Para caderno, usamos 'notebook'."}
 ],
 informatica:[
-{id:601,d:"facil",p:"O que significa CPU?",a:["Memória","Unidade Central de Processamento","Tela","Teclado"],c:1},
-{id:602,d:"facil",p:"Qual dispositivo é usado para digitar textos?",a:["Mouse","Monitor","Teclado","Impressora"],c:2}
+{id:601,d:"facil",p:"O que significa a sigla CPU em informática?",a:["Memória Principal","Unidade Central de Processamento","Tela de Vídeo","Placa de Rede"],c:1,e:"CPU (Central Processing Unit) é o cérebro do computador responsável por executar instruções lógicas e aritméticas."},
+{id:602,d:"facil",p:"Qual dos seguintes periféricos é estritamente de entrada de dados?",a:["Monitor","Impressora","Teclado","Caixa de Som"],c:2,e:"O teclado envia comandos e dados para o computador, classificando-se como dispositivo de entrada."}
 ],
 educacao:[
-{id:701,d:"facil",p:"Quantos jogadores cada equipe começa tendo em campo no futebol?",a:["9","10","11","12"],c:2},
-{id:702,d:"facil",p:"Qual esporte utiliza uma cesta?",a:["Basquete","Tênis","Natação","Vôlei"],c:0}
+{id:701,d:"facil",p:"Quantos jogadores titulares cada equipe tem em campo em uma partida oficial de futebol?",a:["9","10","11","12"],c:2,e:"Cada equipe entra em campo com 11 jogadores (sendo 1 goleiro e 10 jogadores de linha)."},
+{id:702,d:"facil",p:"Qual modalidade esportiva utiliza uma cesta suspensa para pontuação?",a:["Basquete","Tênis","Natação","Vôlei"],c:0,e:"No basquetebol, o objetivo principal é arremessar a bola dentro da cesta doadversário."}
 ]
 };
 
@@ -919,7 +916,6 @@ function addXP(amount){
  updateLevel();
 }
 
-/* Navegação da Capa */
 function startQuickGame(){
  startQuiz('geral');
 }
@@ -1048,7 +1044,7 @@ function handleAnswer(index){
   addXP(gainedXP);
 
   feedback.className="feedback success";
-  feedback.innerHTML=`✅ <strong>Resposta correta!</strong><br>+${points} pontos • +${gainedXP} XP`;
+  feedback.innerHTML=`✅ <strong>Resposta correta!</strong><br>+${points} pontos • +${gainedXP} XP<div class="feedback-explanation">💡 <strong>Explicação:</strong> ${q.e}</div>`;
   const chosen=Array.from(buttons).find(b=>Number(b.dataset.original)===index);
   if(chosen)chosen.classList.add("correct");
   playSound("correct");
@@ -1061,7 +1057,7 @@ function handleAnswer(index){
    if(chosen)chosen.classList.add("wrong");
   }
   feedback.className="feedback error";
-  feedback.innerHTML=index===-1?`⏰ <strong>Tempo esgotado!</strong><br>Resposta correta: <strong>${q.a[q.c]}</strong>`:`❌ <strong>Resposta incorreta.</strong><br>Resposta correta: <strong>${q.a[q.c]}</strong>`;
+  feedback.innerHTML=index===-1?`⏰ <strong>Tempo esgotado!</strong><br>Resposta correta: <strong>${q.a[q.c]}</strong><div class="feedback-explanation">💡 <strong>Explicação:</strong> ${q.e}</div>`:`❌ <strong>Resposta incorreta.</strong><br>Resposta correta: <strong>${q.a[q.c]}</strong><div class="feedback-explanation">💡 <strong>Explicação:</strong> ${q.e}</div>`;
   playSound("wrong");
   updateLives();
  }
@@ -1296,7 +1292,6 @@ function clearData(){
  updateLevel();
 }
 
-/* Inicialização */
 updatePlayer();
 loadTheme();
 loadRecords();
